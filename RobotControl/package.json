@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "dotenv-extended": "^2.9.0",
+    "johnny-five": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.12.1"
+  }
+}
