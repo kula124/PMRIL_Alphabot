@@ -1,45 +1,34 @@
-from cv2.cv2 import findContours, RETR_CCOMP, CHAIN_APPROX_SIMPLE, putText, moments, inRange, MORPH_RECT, \
-    getStructuringElement, erode, dilate
+from typing import Tuple, Any, List
+
+from cv2.cv2 import findContours, RETR_CCOMP, CHAIN_APPROX_SIMPLE, moments
 
 from models.object import Object
-from presentation.drawer import Drawer
+from utils.filter_error import FilterError
+from utils.graphic import perform_morphological_operations, get_threshold_matrix
 
 
 class Tracker:
     def __init__(self, config):
         self.__config = config
-        self.__drawer = Drawer(config)
 
-    def track_objects(self, filters, camera_feed_matrix, hsv_matrix):
+    def get_filtered_objects(self, filters, hsv_matrix) -> List[Tuple[List[Object], Any, Any]]:
+        filtered_objects = []
+
         for filter in filters:
-            threshold_matrix = inRange(hsv_matrix, (filter.H_MIN, filter.S_MIN, filter.V_MIN),
-                                       (filter.H_MAX, filter.S_MAX, filter.V_MAX))
-            enhanced_threshold_matrix = self.__morph_ops(threshold_matrix)
+            threshold_matrix = get_threshold_matrix(hsv_matrix, filter)
+            enhanced_threshold_matrix = perform_morphological_operations(threshold_matrix)
 
-            self.__track_object(enhanced_threshold_matrix, camera_feed_matrix, "Item")
+            filtered_objects.append(self.__get_object(enhanced_threshold_matrix, "Item"))
 
-    def __morph_ops(self, threshold_matrix):
-        # create structuring element that will be used to "dilate" and "erode" image.
-        # the element chosen here is a 3px by 3px rectangle
+        return filtered_objects
 
-        erode_element = getStructuringElement(MORPH_RECT, (3, 3))
-        # dilate with larger element so make sure object is nicely visible
-        dilate_element = getStructuringElement(MORPH_RECT, (8, 8))
-
-        threshold_matrix = erode(threshold_matrix, erode_element, iterations=2)
-
-        threshold_matrix = dilate(threshold_matrix, dilate_element, iterations=2)
-
-        return threshold_matrix
-
-    def __track_object(self, threshold_matrix, camera_feed_matrix, label) -> None:
+    def __get_object(self, threshold_matrix, label) -> Tuple[List[Object], Any, Any]:
         objects = []
 
         contours, hierarchy = findContours(threshold_matrix, RETR_CCOMP, CHAIN_APPROX_SIMPLE)
 
         if hierarchy is not None and hierarchy.size > int(self.__config['object']['MAX_NUM_OBJECTS']):
-            putText(camera_feed_matrix, 'Too much noise! Adjust filter', (0, 50), 1, 2, (0, 0, 255), 2)
-            return
+            raise FilterError('Too much noise! Adjust filter')
 
         if hierarchy is not None and hierarchy.size > 0:
             i = 0
@@ -58,5 +47,6 @@ class Tracker:
 
                 i = hierarchy[0][i][0]
 
-            if objects:
-                self.__drawer.mark_objects(objects, camera_feed_matrix, contours, hierarchy)
+            return objects, contours, hierarchy
+
+        return [], None, None

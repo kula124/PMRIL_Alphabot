@@ -1,10 +1,13 @@
 import configparser
 
 from cv2 import createTrackbar, namedWindow, setMouseCallback, imshow
+from cv2.cv2 import putText
 
 from detector.automatic_filter_tuner import AutomaticFilterTuner
 from detector.tracker import Tracker
 from models.hsv_filter import HSVFilter
+from presentation.drawer import Drawer
+from utils.filter_error import FilterError
 
 
 class PresentationManager:
@@ -13,21 +16,29 @@ class PresentationManager:
         self.__config = config
         self.__initialize()
         self.__tracker = Tracker(config)
+        self.__drawer = Drawer(config)
 
     def refresh(self, camera_feed, hsv_matrix):
         filters = self.__filter_tuner.recorded_hsv_filters
 
-        self.__tracker.track_objects(filters, camera_feed, hsv_matrix)
+        try:
+            filtered_objects = self.__tracker.get_filtered_objects(filters, hsv_matrix)
 
-        # imshow(config['window']['name2'], compound_threshold_matrix if compound_threshold_matrix is not None else blank_image)
-        # imshow(config['window']['name1'], hsv_matrix)
-        # imshow('morphed', morphed_matrix)
+            for (objects, contours, hierarchy) in filtered_objects:
+                self.__drawer.mark_objects(objects, camera_feed, contours, hierarchy)
 
-        imshow(self.__config['window']['original'], camera_feed)
+            # imshow(config['window']['name2'], compound_threshold_matrix if compound_threshold_matrix is not None else blank_image)
+            # imshow(config['window']['name1'], hsv_matrix)
+            # imshow('morphed', morphed_matrix)
 
-        # imshow(config['window']['thresholded'], threshold_matrix)
-        # imshow(config['window']['name1'], hsv_matrix)
-        # imshow('morphed', morphed_matrix)
+            imshow(self.__config['window']['original'], camera_feed)
+
+            # imshow(config['window']['thresholded'], threshold_matrix)
+            # imshow(config['window']['name1'], hsv_matrix)
+            # imshow('morphed', morphed_matrix)
+
+        except FilterError as e:
+            putText(camera_feed, e.message, (0, 50), 1, 2, (0, 0, 255), 2)
 
     def __initialize(self) -> None:
         if self.__config.getboolean('other', 'calibration_mode'):
