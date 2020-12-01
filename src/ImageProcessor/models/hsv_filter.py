@@ -2,13 +2,15 @@ import configparser
 
 
 class HSVFilter:
-    def __init__(self, H_MIN, H_MAX, S_MIN, S_MAX, V_MIN, V_MAX, ):
+    def __init__(self, H_MIN, H_MAX, S_MIN, S_MAX, V_MIN, V_MAX, label=None):
         self.H_MIN = int(H_MIN)
         self.H_MAX = int(H_MAX)
         self.S_MIN = int(S_MIN)
         self.S_MAX = int(S_MAX)
         self.V_MIN = int(V_MIN)
         self.V_MAX = int(V_MAX)
+
+        self.label = label
 
     def set_H_MIN(self, val):
         self.H_MIN = val

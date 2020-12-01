@@ -14,7 +14,7 @@ class AutomaticFilterTuner:
         self.__on_reset_filter = on_reset_filter
         self.recorded_hsv_filters = []
 
-    def clickAndDrag_Rectangle(self, event, x, y, flags, video_feed):
+    def clickAndDrag_Rectangle(self, event, x, y):
         if event == EVENT_LBUTTONDOWN and not self.__is_mouse_dragging:
             # keep track of initial point clicked
             self.__initial_click_point = (x, y)

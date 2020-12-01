@@ -18,7 +18,7 @@ class Tracker:
             threshold_matrix = get_threshold_matrix(hsv_matrix, filter)
             enhanced_threshold_matrix = perform_morphological_operations(threshold_matrix)
 
-            filtered_objects.append(self.__get_object(enhanced_threshold_matrix, "Item"))
+            filtered_objects.append(self.__get_object(enhanced_threshold_matrix, filter.label))
 
         return filtered_objects
 
