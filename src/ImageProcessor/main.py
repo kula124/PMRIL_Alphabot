@@ -29,14 +29,17 @@ def main(config: configparser.ConfigParser):
 
         filter_tuner.record_hsv_values(camera_feed_matrix, hsv_matrix)
 
-        try:
-            filtered_objects = tracker.get_filtered_objects(filter_tuner.recorded_hsv_filters, hsv_matrix)
+        if filter_tuner.is_tuned():
+            try:
+                filtered_objects = tracker.get_filtered_objects(filter_tuner.recorded_hsv_filters, hsv_matrix)
 
-            presentation_manager.refresh(camera_feed_matrix, filtered_objects)
-        except FilterError as e:
-            presentation_manager.display_error(camera_feed_matrix, e.message)
+                presentation_manager.refresh(camera_feed_matrix, filtered_objects)
+            except FilterError as e:
+                presentation_manager.display_error(camera_feed_matrix, e.message)
+        else:
+            presentation_manager.display_message(camera_feed_matrix, filter_tuner.get_tuning_message())
 
-        waitKey(30)
+        waitKey(config['frame']['refresh_delay'])
 
 
 if __name__ == '__main__':

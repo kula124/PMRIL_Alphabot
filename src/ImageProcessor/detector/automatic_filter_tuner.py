@@ -1,6 +1,7 @@
 from cv2.cv2 import EVENT_LBUTTONDOWN, EVENT_MOUSEMOVE, EVENT_LBUTTONUP, EVENT_RBUTTONDOWN, rectangle
 
 from models.hsv_filter import HSVFilter
+from models.vehicle_enum import VehiclePart
 
 
 class AutomaticFilterTuner:
@@ -14,7 +15,9 @@ class AutomaticFilterTuner:
         self.__on_reset_filter = on_reset_filter
         self.recorded_hsv_filters = []
 
-    def clickAndDrag_Rectangle(self, event, x, y):
+    # noinspection PyUnusedLocal
+    # needs it for the signature
+    def clickAndDrag_Rectangle(self, event, x, y, flags, video_feed):
         if event == EVENT_LBUTTONDOWN and not self.__is_mouse_dragging:
             # keep track of initial point clicked
             self.__initial_click_point = (x, y)
@@ -67,4 +70,22 @@ class AutomaticFilterTuner:
 
         self.__rectangle_selected = False
 
-        self.recorded_hsv_filters.append(HSVFilter(h_min, h_max, s_min, s_max, v_min, v_max))
+        self.record_filter(HSVFilter(h_min, h_max, s_min, s_max, v_min, v_max))
+
+    def get_tuning_message(self):
+        if len(self.recorded_hsv_filters) == 0:
+            return 'Select car hood'
+        elif len(self.recorded_hsv_filters) == 1:
+            return 'Select car trunk'
+        return ''
+
+    def is_tuned(self):
+        return len(self.recorded_hsv_filters) == 2
+
+    def record_filter(self, hsv: HSVFilter):
+        if len(self.recorded_hsv_filters) == 0:
+            hsv.label = str(VehiclePart.hood)
+            self.recorded_hsv_filters.append(hsv)
+        elif len(self.recorded_hsv_filters) == 1:
+            hsv.label = str(VehiclePart.trunk)
+            self.recorded_hsv_filters.append(hsv)

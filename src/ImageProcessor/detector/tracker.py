@@ -1,6 +1,7 @@
-from typing import Tuple, Any, List
+from typing import Tuple, List
 
 from cv2.cv2 import findContours, RETR_CCOMP, CHAIN_APPROX_SIMPLE, moments
+from numpy import ndarray
 
 from models.object import Object
 from utils.filter_error import FilterError
@@ -11,7 +12,7 @@ class Tracker:
     def __init__(self, config):
         self.__config = config
 
-    def get_filtered_objects(self, filters, hsv_matrix) -> List[Tuple[List[Object], Any, Any]]:
+    def get_filtered_objects(self, filters, hsv_matrix) -> List[Tuple[List[Object], List[ndarray], ndarray]]:
         filtered_objects = []
 
         for filter in filters:
@@ -22,7 +23,7 @@ class Tracker:
 
         return filtered_objects
 
-    def __get_object(self, threshold_matrix, label) -> Tuple[List[Object], Any, Any]:
+    def __get_object(self, threshold_matrix, label) -> Tuple[List[Object], List[ndarray], ndarray]:
         objects = []
 
         contours, hierarchy = findContours(threshold_matrix, RETR_CCOMP, CHAIN_APPROX_SIMPLE)

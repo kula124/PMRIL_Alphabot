@@ -21,6 +21,18 @@ class PresentationManager:
         for (objects, contours, hierarchy) in filtered_objects:
             self.__drawer.mark_objects(objects, camera_feed, contours, hierarchy)
 
+        self.__refresh(camera_feed)
+
+    def display_error(self, camera_feed, message: str) -> None:
+        putText(camera_feed, message, (0, 50), 1, 2, (255, 0, 0), 2)
+        self.__refresh(camera_feed)
+
+    def display_message(self, camera_feed, message: str) -> None:
+        putText(camera_feed, message, (0, 50), 1, 2, (0, 0, 255), 2)
+        self.__refresh(camera_feed)
+
+    def __refresh(self, camera_feed):
+        # TODO: Make this configurable
         # imshow(config['window']['name2'], compound_threshold_matrix if compound_threshold_matrix is not None else blank_image)
         # imshow(config['window']['name1'], hsv_matrix)
         # imshow('morphed', morphed_matrix)
@@ -30,9 +42,6 @@ class PresentationManager:
         # imshow(config['window']['thresholded'], threshold_matrix)
         # imshow(config['window']['name1'], hsv_matrix)
         # imshow('morphed', morphed_matrix)
-
-    def display_error(self, camera_feed, message: str) -> None:
-        putText(camera_feed, message, (0, 50), 1, 2, (0, 0, 255), 2)
 
     def __initialize(self) -> None:
         if self.__config.getboolean('other', 'calibration_mode'):
