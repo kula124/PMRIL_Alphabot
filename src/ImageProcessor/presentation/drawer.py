@@ -10,7 +10,7 @@ class Drawer:
         self.__draw_contours = config.getboolean('drawer', 'draw_contours')
         self.__center_marker_radius = config.getint('drawer', 'center_marker_radius')
 
-    def mark_objects(self, objects: List[Object], frame, contours, hierarchy):
+    def mark_objects(self, objects: List[Object], frame, contours, hierarchy) -> None:
         for i, obj in enumerate(objects):
             contour_position = (int(obj.get_x_pos()), int(obj.get_y_pos()))
             pos_text_position = (int(obj.get_x_pos()), int(obj.get_y_pos() + 20))

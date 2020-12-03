@@ -1,11 +1,14 @@
 import configparser
+from typing import List, Tuple
 
 from cv2 import createTrackbar, namedWindow, setMouseCallback, imshow
 from cv2.cv2 import putText
+from numpy import ndarray
 
 from detector.automatic_filter_tuner import AutomaticFilterTuner
 from detector.tracker import Tracker
 from models.hsv_filter import HSVFilter
+from models.object import Object
 from presentation.drawer import Drawer
 
 
@@ -13,11 +16,13 @@ class PresentationManager:
     def __init__(self, config: configparser.ConfigParser, filter_tuner: AutomaticFilterTuner):
         self.__filter_tuner = filter_tuner
         self.__config = config
-        self.__initialize()
         self.__tracker = Tracker(config)
         self.__drawer = Drawer(config)
 
-    def refresh(self, camera_feed, filtered_objects):
+        self.__initialize()
+
+    """Redraws the image based on camera feed with any objects that might appear"""
+    def refresh(self, camera_feed, filtered_objects: List[Tuple[List[Object], List[ndarray], ndarray]]) -> None:
         for (objects, contours, hierarchy) in filtered_objects:
             self.__drawer.mark_objects(objects, camera_feed, contours, hierarchy)
 
