@@ -7,12 +7,14 @@ from models.object import Object
 from models.sample import Sample
 from models.sample_request_model import SampleRequestModel
 from models.vehicle_enum import VehiclePart
+from utils.logger_factory import get_logger
 
 
 class CommunicationManager:
     def __init__(self, config: configparser.ConfigParser):
+        self.__logger = get_logger()
         self.__config = config
-        self.__sample_count = int(self.__config['communication']['sample_count'])
+        self.__sample_count = self.__config.getint('communication', 'sample_count')
         self.__current_sample_count = 0
         self.__samples: List[Sample] = []
         self.__target_coordinates = None
@@ -26,6 +28,8 @@ class CommunicationManager:
             sample_request_model = self.__build_sample_request_model()
 
             request_json = json.dumps(sample_request_model.__dict__)
+
+            self.__logger.info(f'Sending following data to the server {request_json}')
             self.__controller_notifier.notify(request_json)
 
     def __add_samples(self, filtered_objects: List[Object]) -> None:

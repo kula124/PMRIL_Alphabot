@@ -6,10 +6,9 @@ LOG_FILE_NAME = 'ImageProcessor.log'
 DEFAULT_LOG_FORMATTER = '%(asctime)s - %(relativeCreated)6d - %(threadName)s - %(levelname)s - %(message)s'
 __is_configured = False
 
-print("I'm imported")
-
 
 def initialize(config: configparser.ConfigParser) -> None:
+    global __is_configured
     if __is_configured:
         return
 
@@ -21,8 +20,10 @@ def initialize(config: configparser.ConfigParser) -> None:
 
     __add_file_handler(formatter, logger, logging_level)
 
-    if config['logging']['log_to_console']:
-        __add_console_handler(formatter, logger)
+    if config.getboolean('logging', 'log_to_console'):
+        __add_console_handler(formatter, logger, logging_level)
+
+    __is_configured = True
 
 
 def __add_console_handler(formatter: logging.Formatter, logger: logging.Logger, logging_level: str) -> None:
