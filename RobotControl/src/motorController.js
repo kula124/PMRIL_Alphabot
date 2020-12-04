@@ -17,17 +17,22 @@ const motorRight = new five.Motor({
 });
 
 const _defaultSpeed = process.env.DEFAULT_SPEED
+const _leftCalibration = process.env.CALIBRATION_LEFT
+const _rightCalibration = process.env.CALIBRATION_RIGHT
+
+const leftDefaultSpeed = parseInt(_defaultSpeed) + parseInt(_leftCalibration)
+const rightDefaultSpeed = parseInt(_defaultSpeed) + parseInt(_rightCalibration)
 
 let isInverted = false;
 
 const straightForward = () => {
-  console.log(_defaultSpeed)
+  console.log(leftDefaultSpeed, rightDefaultSpeed)
   if (isInverted) {
-    motorRight.reverse(_defaultSpeed)
-    motorLeft.reverse(_defaultSpeed)
+    motorRight.reverse(rightDefaultSpeed)
+    motorLeft.reverse(leftDefaultSpeed)
   } else {
-    motorRight.forward(_defaultSpeed)
-    motorLeft.forward(_defaultSpeed)
+    motorRight.forward(rightDefaultSpeed)
+    motorLeft.forward(leftDefaultSpeed)
   }
 }
 
@@ -38,11 +43,11 @@ const steerLeft = diffAngle => {
   const mappedValue = 10; // example only
   // TODO: actually implement mapping
   if (isInverted) {
-    motorRight.reverse(_defaultSpeed + mappedValue)
-    motorLeft.reverse(_defaultSpeed)
+    motorRight.reverse(rightDefaultSpeed + mappedValue)
+    motorLeft.reverse(leftDefaultSpeed)
   } else {
-    motorRight.forward(_defaultSpeed + mappedValue)
-    motorLeft.forward(_defaultSpeed)
+    motorRight.forward(rightDefaultSpeed + mappedValue)
+    motorLeft.forward(leftDefaultSpeed)
   }
 }
 
@@ -51,11 +56,11 @@ const steerRight = diffAngle => {
   const mappedValue = 10; // example only
   // TODO: actually implement mapping
   if (isInverted) {
-    motorLeft.reverse(_defaultSpeed + mappedValue)
-    motorRight.reverse(_defaultSpeed)
+    motorLeft.reverse(leftDefaultSpeed + mappedValue)
+    motorRight.reverse(rightDefaultSpeed)
   } else {
-    motorLeft.forward(_defaultSpeed + mappedValue)
-    motorRight.forward(_defaultSpeed)
+    motorLeft.forward(leftDefaultSpeed + mappedValue)
+    motorRight.forward(rightDefaultSpeed)
   }
 }
 

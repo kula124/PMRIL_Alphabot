@@ -5,12 +5,13 @@ const delay = duration => new Promise((resolve, reject) => {
 })
 
 const testFunction = async () => {
-    motorController.straightForward(200)
-    await delay(2000);
+    motorController.straightForward()
+    await delay(1000);
     motorController.stop()
+    await delay(1000)
     motorController.setInverted(true)
-    motorController.straightForward(200)
-    await delay(2000)
+    motorController.straightForward()
+    await delay(1000)
     motorController.stop()
 }
 

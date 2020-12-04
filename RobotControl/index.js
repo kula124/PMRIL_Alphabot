@@ -9,7 +9,7 @@ const initBoard = () => {
   newBoard.on('ready', function () {
     const led = new five.Led(13)
     led.blink(500)
-    require('./src/mainController')
+    require('./src/mainController')()
   })
 }
 
