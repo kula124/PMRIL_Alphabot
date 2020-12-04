@@ -46,7 +46,7 @@ class AutomaticFilterTuner:
             self.recorded_hsv_filters.clear()
             self.__on_reset_filter()
 
-    def record_hsv_values(self, frame, hsv_frame):
+    def record_hsv_values(self, frame, hsv_frame) -> None:
         if self.__mouse_move:
             # draw the click
             rectangle(frame, self.__initial_click_point, self.__current_mouse_point, (0, 255, 0))
@@ -72,20 +72,20 @@ class AutomaticFilterTuner:
 
         self.record_filter(HSVFilter(h_min, h_max, s_min, s_max, v_min, v_max))
 
-    def get_tuning_message(self):
+    def get_tuning_message(self) -> str:
         if len(self.recorded_hsv_filters) == 0:
             return 'Select car hood'
         elif len(self.recorded_hsv_filters) == 1:
             return 'Select car trunk'
         return ''
 
-    def is_tuned(self):
+    def is_tuned(self) -> bool:
         return len(self.recorded_hsv_filters) == 2
 
-    def record_filter(self, hsv: HSVFilter):
+    def record_filter(self, hsv: HSVFilter) -> None:
         if len(self.recorded_hsv_filters) == 0:
-            hsv.label = str(VehiclePart.hood)
+            hsv.label = str(VehiclePart.hood.name)
             self.recorded_hsv_filters.append(hsv)
         elif len(self.recorded_hsv_filters) == 1:
-            hsv.label = str(VehiclePart.trunk)
+            hsv.label = str(VehiclePart.trunk.name)
             self.recorded_hsv_filters.append(hsv)

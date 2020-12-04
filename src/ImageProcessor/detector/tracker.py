@@ -4,6 +4,7 @@ from cv2.cv2 import findContours, RETR_CCOMP, CHAIN_APPROX_SIMPLE, moments
 from numpy import ndarray
 
 from models.object import Object
+from utils import logger_factory
 from utils.filter_error import FilterError
 from utils.graphic import perform_morphological_operations, get_threshold_matrix
 
@@ -11,6 +12,7 @@ from utils.graphic import perform_morphological_operations, get_threshold_matrix
 class Tracker:
     def __init__(self, config):
         self.__config = config
+        self.__logger = logger_factory.get_logger()
 
     def get_filtered_objects(self, filters, hsv_matrix) -> List[Tuple[List[Object], List[ndarray], ndarray]]:
         filtered_objects = []
@@ -29,10 +31,12 @@ class Tracker:
         contours, hierarchy = findContours(threshold_matrix, RETR_CCOMP, CHAIN_APPROX_SIMPLE)
 
         if hierarchy is not None and hierarchy.size > int(self.__config['object']['MAX_NUM_OBJECTS']):
+            self.__logger.error(f'Number of {label} objects detected ({hierarchy.size}) exceeded max number.')
             raise FilterError('Too much noise! Adjust filter')
 
         if hierarchy is not None and hierarchy.size > 0:
             i = 0
+            self.__logger.debug(f'Found {hierarchy.size} {label}.')
             while i >= 0:
                 moment = moments(contours[i])
 
@@ -45,6 +49,8 @@ class Tracker:
                 if area > int(self.__config['object']['MIN_OBJECT_AREA']):
                     obj = Object(label=label, x=moment['m10'] / area, y=moment['m01'] / area)
                     objects.append(obj)
+                else:
+                    self.__logger.debug(f'Object with area f{area} is too small.')
 
                 i = hierarchy[0][i][0]
 

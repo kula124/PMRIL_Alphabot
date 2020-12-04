@@ -43,7 +43,10 @@ def main(config: configparser.ConfigParser):
                 filtering_artifacts = tracker.get_filtered_objects(filter_tuner.recorded_hsv_filters, hsv_matrix)
 
                 presentation_manager.refresh(camera_feed_matrix, filtering_artifacts)
-                communication_manager.handle(list(map(lambda fa: fa[0], filtering_artifacts)), (0, 0))
+
+                flat_object_list = [obj for sublist in [art[0] for art in filtering_artifacts] for obj in sublist]
+
+                communication_manager.handle(flat_object_list, (0, 0))
             except FilterError as e:
                 presentation_manager.display_error(camera_feed_matrix, e.message)
         else:
