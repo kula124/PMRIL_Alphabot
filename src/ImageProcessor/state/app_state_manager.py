@@ -73,7 +73,7 @@ class AppStateManager:
             filtering_artifacts = self.__tracker.get_filtered_objects(self.__filter_tuner.recorded_hsv_filters,
                                                                       hsv_matrix)
 
-            self.__presentation_manager.refresh(camera_feed_matrix, filtering_artifacts)
+            self.__presentation_manager.refresh(camera_feed_matrix, filtering_artifacts, self.__target_provider.target)
 
             flat_object_list = [obj for sublist in [art[0] for art in filtering_artifacts] for obj in sublist]
 

@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Tuple
 
-from cv2.cv2 import circle, putText, drawContours
+from cv2.cv2 import circle, putText, drawContours, drawMarker, MARKER_TILTED_CROSS
 
 from models.object import Object
 
@@ -22,3 +22,6 @@ class Drawer:
 
             if self.__draw_contours:
                 drawContours(frame, contours, i, obj.get_color(), 1, 8, hierarchy)
+
+    def mark_target(self, target: Tuple[int, int], frame) -> None:
+        drawMarker(frame, target, (0, 0, 255), MARKER_TILTED_CROSS, thickness=2)

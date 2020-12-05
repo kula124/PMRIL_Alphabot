@@ -17,11 +17,14 @@ class PresentationManager:
 
         self.__initialize()
 
-    def refresh(self, camera_feed, filtered_objects: List[Tuple[List[Object], List[ndarray], ndarray]]) -> None:
+    def refresh(self, camera_feed, filtered_objects: List[Tuple[List[Object], List[ndarray], ndarray]],
+                target: Tuple[int, int]) -> None:
         """Redraws the image based on camera feed with any objects that might appear"""
 
         for (objects, contours, hierarchy) in filtered_objects:
             self.__drawer.mark_objects(objects, camera_feed, contours, hierarchy)
+
+        self.__drawer.mark_target(target, camera_feed)
 
         self.__refresh(camera_feed)
 
