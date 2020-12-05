@@ -85,4 +85,5 @@ class AppStateManager:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.__logger.debug('Disposing app state manager!')
         self.__communication_manager.dispose()
