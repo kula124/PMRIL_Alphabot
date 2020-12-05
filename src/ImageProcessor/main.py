@@ -1,7 +1,5 @@
 import configparser
 
-from cv2.cv2 import waitKey
-
 from detector.video_provider import get_video_provider
 from state.app_state_manager import AppStateManager
 from utils import logger_factory
@@ -12,7 +10,6 @@ def main(config: configparser.ConfigParser):
 
     logger.info('Initializing image processor.')
     video = get_video_provider(config)
-    refresh_delay = config.getint('frame', 'refresh_delay')
 
     with AppStateManager(config) as app_state_manager:
         logger.info('Successfully initialized image processor.')
@@ -24,8 +21,6 @@ def main(config: configparser.ConfigParser):
                 return -1
 
             app_state_manager.get_state_action(camera_feed_matrix)()
-
-            waitKey(refresh_delay)
 
 
 if __name__ == '__main__':
