@@ -71,3 +71,6 @@ class CommunicationManager:
             y = y + pos.y
 
         return Sample(part_type, x // n, y // n)
+
+    def dispose(self):
+        self.__controller_notifier.dispose()

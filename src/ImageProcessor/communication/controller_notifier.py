@@ -37,3 +37,6 @@ class ControllerNotifier:
             raise e
         finally:
             self.__worker_thread.stop()
+
+    def dispose(self):
+        self.__worker_thread.stop()
