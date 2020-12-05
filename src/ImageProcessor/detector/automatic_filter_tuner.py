@@ -17,7 +17,7 @@ class AutomaticFilterTuner:
 
     # noinspection PyUnusedLocal
     # needs it for the signature
-    def clickAndDrag_Rectangle(self, event, x, y, flags, video_feed):
+    def clickAndDrag_Rectangle(self, event: int, x: int, y: int, flags: int, video_feed) -> None:
         if event == EVENT_LBUTTONDOWN and not self.__is_mouse_dragging:
             # keep track of initial point clicked
             self.__initial_click_point = (x, y)

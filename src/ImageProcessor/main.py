@@ -4,6 +4,7 @@ from cv2.cv2 import waitKey, cvtColor, COLOR_BGR2HSV
 
 from communication.communication_manager import CommunicationManager
 from detector.automatic_filter_tuner import AutomaticFilterTuner
+from detector.target_provider import TargetProvider
 from detector.tracker import Tracker
 from detector.video_provider import get_video_provider
 from presentation.presentation_manager import PresentationManager
@@ -17,13 +18,15 @@ def main(config: configparser.ConfigParser):
     logger.info('Initializing image processor.')
     filter_tuner = AutomaticFilterTuner()
     tracker = Tracker(config)
-    presentation_manager = PresentationManager(config, filter_tuner)
+    target_provider = TargetProvider()
     communication_manager = CommunicationManager(config)
+    presentation_manager = PresentationManager(config, filter_tuner.clickAndDrag_Rectangle,
+                                               target_provider.target_selector)
 
     video = get_video_provider(config)
     refresh_delay = config.getint('frame', 'refresh_delay')
 
-    waitKey(10 * refresh_delay)
+    # waitKey(10 * refresh_delay)
 
     logger.info('Successfully initialized image processor.')
 
@@ -35,9 +38,9 @@ def main(config: configparser.ConfigParser):
             return -1
 
         hsv_matrix = cvtColor(camera_feed_matrix, COLOR_BGR2HSV)
-
         filter_tuner.record_hsv_values(camera_feed_matrix, hsv_matrix)
 
+        # app_state_manager.get_state_action().execute()
         if filter_tuner.is_tuned():
             try:
                 filtering_artifacts = tracker.get_filtered_objects(filter_tuner.recorded_hsv_filters, hsv_matrix)
