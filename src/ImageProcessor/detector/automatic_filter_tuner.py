@@ -1,18 +1,19 @@
 from cv2.cv2 import EVENT_LBUTTONDOWN, EVENT_MOUSEMOVE, EVENT_LBUTTONUP, EVENT_RBUTTONDOWN, rectangle
 
+from app_state_manager import AppStateManager, FILTER_TUNED, FILTER_UNTUNED
 from models.hsv_filter import HSVFilter
 from models.vehicle_enum import VehiclePart
 
 
 class AutomaticFilterTuner:
-    def __init__(self, on_reset_filter=lambda: None):
+    def __init__(self, app_state_manager: AppStateManager):
+        self.__app_state_manager = app_state_manager
         self.__is_mouse_dragging = False
         self.__initial_click_point = None
         self.__current_mouse_point = None
         self.__mouse_move = False
         self.__rectangle_roi = None
         self.__rectangle_selected = False
-        self.__on_reset_filter = on_reset_filter
         self.recorded_hsv_filters = []
 
     # noinspection PyUnusedLocal
@@ -42,9 +43,7 @@ class AutomaticFilterTuner:
             self.__rectangle_selected = True
 
         if event == EVENT_RBUTTONDOWN:
-            self.__rectangle_selected = False
-            self.recorded_hsv_filters.clear()
-            self.__on_reset_filter()
+            self.__reset_filter()
 
     def record_hsv_values(self, frame, hsv_frame) -> None:
         if self.__mouse_move:
@@ -89,3 +88,9 @@ class AutomaticFilterTuner:
         elif len(self.recorded_hsv_filters) == 1:
             hsv.label = str(VehiclePart.trunk.name)
             self.recorded_hsv_filters.append(hsv)
+            self.__app_state_manager.dispatch_action(FILTER_TUNED)
+
+    def __reset_filter(self):
+        self.__rectangle_selected = False
+        self.recorded_hsv_filters.clear()
+        self.__app_state_manager.dispatch_action(FILTER_UNTUNED)
