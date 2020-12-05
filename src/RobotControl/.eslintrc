@@ -2,6 +2,7 @@
     "extends": [
         "standard"
     ],
+    "ignorePatterns": "node_modules",
     "rules": {
         "comma-dangle": [
             "error",
