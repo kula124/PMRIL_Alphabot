@@ -2,11 +2,13 @@ from typing import Tuple
 
 from cv2.cv2 import EVENT_MBUTTONUP, EVENT_FLAG_ALTKEY
 
-from app_state_manager import AppStateManager, TARGET_UNSELECTED, TARGET_SELECTED
+from state.state_actions import TARGET_UNSELECTED, TARGET_SELECTED
 
 
 class TargetProvider:
-    def __init__(self, app_state_manager: AppStateManager):
+    # noinspection PyUnresolvedReferences
+    # if imported it will cause circular dependency import error
+    def __init__(self, app_state_manager: 'AppStateManager'):
         self.__app_state_manager = app_state_manager
         self.target: Tuple[int, int] = None
 

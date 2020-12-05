@@ -1,12 +1,14 @@
 from cv2.cv2 import EVENT_LBUTTONDOWN, EVENT_MOUSEMOVE, EVENT_LBUTTONUP, EVENT_RBUTTONDOWN, rectangle
 
-from app_state_manager import AppStateManager, FILTER_TUNED, FILTER_UNTUNED
 from models.hsv_filter import HSVFilter
 from models.vehicle_enum import VehiclePart
+from state.state_actions import FILTER_TUNED, FILTER_UNTUNED
 
 
 class AutomaticFilterTuner:
-    def __init__(self, app_state_manager: AppStateManager):
+    # noinspection PyUnresolvedReferences
+    # if imported it will cause circular dependency import error
+    def __init__(self, app_state_manager: 'AppStateManager'):
         self.__app_state_manager = app_state_manager
         self.__is_mouse_dragging = False
         self.__initial_click_point = None

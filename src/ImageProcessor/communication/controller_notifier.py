@@ -7,6 +7,7 @@ from utils.async_event_loop_thread import AsyncEventLoopThread
 from utils.logger_factory import get_logger
 
 
+# TODO: Antonio - Propagate errors from worker thread to the main thread.
 class ControllerNotifier:
     def __init__(self, config: configparser.ConfigParser):
         self.__logger = get_logger()

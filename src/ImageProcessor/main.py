@@ -2,8 +2,8 @@ import configparser
 
 from cv2.cv2 import waitKey
 
-from app_state_manager import AppStateManager
 from detector.video_provider import get_video_provider
+from state.app_state_manager import AppStateManager
 from utils import logger_factory
 
 

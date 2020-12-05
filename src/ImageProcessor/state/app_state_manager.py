@@ -8,13 +8,9 @@ from detector.automatic_filter_tuner import AutomaticFilterTuner
 from detector.target_provider import TargetProvider
 from detector.tracker import Tracker
 from presentation.presentation_manager import PresentationManager
+from state.state_actions import FILTER_TUNED, FILTER_UNTUNED, TARGET_SELECTED, TARGET_UNSELECTED
 from utils import logger_factory
 from utils.filter_error import FilterError
-
-FILTER_TUNED = 'FILTER_TUNED'
-FILTER_UNTUNED = 'FILTER_UNTUNED'
-TARGET_SELECTED = 'TARGET_SELECTED'
-TARGET_UNSELECTED = 'TARGET_UNSELECTED'
 
 """
  Redux inspired app state manager
@@ -54,9 +50,9 @@ class AppStateManager:
         if action_type == FILTER_UNTUNED:
             self.__state = self.__state.filter_tuned(False)
         if action_type == TARGET_SELECTED:
-            self.__state = self.__state.is_target_selected(True)
+            self.__state = self.__state.target_selected(True)
         if action_type == TARGET_UNSELECTED:
-            self.__state = self.__state.is_target_selected(False)
+            self.__state = self.__state.target_selected(False)
 
     def get_state_action(self, camera_feed_matrix) -> Callable:
         hsv_matrix = cvtColor(camera_feed_matrix, COLOR_BGR2HSV)

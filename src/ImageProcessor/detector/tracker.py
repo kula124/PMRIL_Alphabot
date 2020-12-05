@@ -1,3 +1,4 @@
+import configparser
 from typing import Tuple, List
 
 from cv2.cv2 import findContours, RETR_CCOMP, CHAIN_APPROX_SIMPLE, moments
@@ -10,7 +11,7 @@ from utils.graphic import perform_morphological_operations, get_threshold_matrix
 
 
 class Tracker:
-    def __init__(self, config):
+    def __init__(self, config: configparser.ConfigParser):
         self.__config = config
         self.__logger = logger_factory.get_logger()
 
