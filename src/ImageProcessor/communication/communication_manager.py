@@ -3,9 +3,9 @@ import json
 from typing import List, Tuple
 
 from communication.controller_notifier import ControllerNotifier
+from kinematics.kinematic_model import KinematicModel, KinematicValues
 from models.object import Object
 from models.sample import Sample
-from models.sample_request_model import SampleRequestModel
 from models.vehicle_enum import VehiclePart
 from utils.logger_factory import get_logger
 
@@ -19,6 +19,7 @@ class CommunicationManager:
         self.__hood_sample_count = 0
         self.__samples: List[Sample] = []
         self.__target_coordinates = None
+        self.__kinematic_model = KinematicModel(config)
         self.__controller_notifier = ControllerNotifier(config)
 
     def handle(self, filtered_objects: List[Object], target: Tuple[int, int]) -> None:
@@ -32,7 +33,7 @@ class CommunicationManager:
 
             request_json = json.dumps(sample_request_model.__dict__)
 
-            self.__logger.info(
+            self.__logger.debug(
                 f'Sampled data (Trunk:{self.__trunk_sample_count}, Hood:{self.__hood_sample_count}): {request_json} ')
             self.__controller_notifier.notify(request_json)
             self.__reset_samples()
@@ -58,11 +59,14 @@ class CommunicationManager:
     def __should_send_data(self) -> bool:
         return self.__trunk_sample_count >= self.__sample_count and self.__hood_sample_count >= self.__sample_count
 
-    def __build_sample_request_model(self) -> SampleRequestModel:
+    def __build_sample_request_model(self) -> KinematicValues:
         trunk = self.__get_average_sample_values(VehiclePart.trunk)
         hood = self.__get_average_sample_values(VehiclePart.hood)
 
-        return SampleRequestModel.create(trunk, hood, self.__target_coordinates)
+        kinematic_values = self.__kinematic_model.get_kinematic_values(tuple(trunk), tuple(hood),
+                                                                       self.__target_coordinates)
+
+        return kinematic_values
 
     def __get_average_sample_values(self, part_type: VehiclePart) -> Sample:
         positions = list(filter(lambda s: s.vehicle_part == part_type, self.__samples))

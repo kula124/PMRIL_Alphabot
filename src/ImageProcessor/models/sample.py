@@ -11,3 +11,7 @@ class Sample:
     @staticmethod
     def create(obj: Object) -> 'Sample':
         return Sample(VehiclePart[obj.get_label()], obj.get_x_pos(), obj.get_y_pos())
+
+    def __iter__(self):
+        yield self.x
+        yield self.y
