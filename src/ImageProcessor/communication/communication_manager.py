@@ -1,5 +1,4 @@
 import configparser
-import json
 from typing import List, Tuple
 
 from communication.controller_notifier import ControllerNotifier
@@ -26,16 +25,12 @@ class CommunicationManager:
         self.__add_samples(filtered_objects)
         self.__target_coordinates = target
 
-        if self.__controller_notifier.exc_info:
-            raise self.__controller_notifier.exc_info[1].with_traceback(self.__controller_notifier.exc_info[2])
         if self.__should_send_data():
             sample_request_model = self.__build_sample_request_model()
 
-            request_json = json.dumps(sample_request_model.__dict__)
-
             self.__logger.debug(
-                f'Sampled data (Trunk:{self.__trunk_sample_count}, Hood:{self.__hood_sample_count}): {request_json} ')
-            self.__controller_notifier.notify(request_json)
+                f'Sampled data (Trunk:{self.__trunk_sample_count}, Hood:{self.__hood_sample_count}): {sample_request_model} ')
+            self.__controller_notifier.notify(sample_request_model.as_big_endian_bytes())
             self.__reset_samples()
 
     def __add_samples(self, filtered_objects: List[Object]) -> None:

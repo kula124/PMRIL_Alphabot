@@ -12,13 +12,6 @@ from state.state_actions import FILTER_TUNED, FILTER_UNTUNED, TARGET_SELECTED, T
 from utils import logger_factory
 from utils.filter_error import FilterError
 
-"""
- Redux inspired app state manager
- Could be split up into action reducer store combination but
- for the sake of simplicity it's all in the same file
- as it's unlikely that the state will grow beyond this point
-"""
-
 
 class AppState:
     def __init__(self, is_filter_tuned: bool = False, is_target_selected: bool = False):
@@ -33,6 +26,13 @@ class AppState:
 
 
 class AppStateManager:
+    """
+     Redux inspired app state manager
+     Could be split up into action reducer store combination but
+     for the sake of simplicity it's all in the same file
+     as it's unlikely that the state will grow beyond this point
+    """
+
     def __init__(self, config: configparser.ConfigParser):
         self.__logger = logger_factory.get_logger()
         self.__filter_tuner = AutomaticFilterTuner(self)

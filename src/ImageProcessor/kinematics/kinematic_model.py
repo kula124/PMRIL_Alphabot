@@ -1,14 +1,21 @@
 import configparser
+import struct
 from typing import Tuple
 
 from math import atan2, pi, sqrt
-from simple_pid import PID
 
 
 class KinematicValues:
     def __init__(self, v: float, w: float):
         self.v = v
         self.w = w
+
+    def as_big_endian_bytes(self) -> bytearray:
+        """
+        First 4 bytes are v and last 4 are w
+        :return: byte array representing speed and angular speed
+        """
+        return bytearray(struct.pack('!f', self.v)) + bytearray(struct.pack('!f', self.w))
 
 
 class KinematicModel:
@@ -17,7 +24,6 @@ class KinematicModel:
         self.__distance_margin = config.getfloat('distance_controller', 'margin')
         self.__distance_kp = config.getfloat('distance_controller', 'k_P')
         self.__current_goal: Tuple[int, int] = None
-        self.__angle_controller: PID = None
 
     def get_kinematic_values(self, trunk: Tuple[int, int], hood: Tuple[int, int],
                              goal: Tuple[int, int]) -> KinematicValues:
