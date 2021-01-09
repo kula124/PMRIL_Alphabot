@@ -4,11 +4,15 @@ from typing import Tuple
 
 from math import atan2, pi, sqrt
 
+STRING_FORMAT = '{:.2f},{:.2f}'
 
 class KinematicValues:
     def __init__(self, v: float, w: float):
         self.v = v
         self.w = w
+
+    def as_string(self)->str:
+        return STRING_FORMAT.format(self.v,self.w)
 
     def as_big_endian_bytes(self) -> bytearray:
         """

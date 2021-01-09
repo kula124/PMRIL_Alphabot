@@ -2,4 +2,5 @@ numpy==1.19.3; platform_system == "Windows"
 numpy==1.19.4; platform_system == "Linux"
 opencv-python==4.4.0.46
 pyserial==3.5
+
 picamera==1.13; platform_system == "Linux"

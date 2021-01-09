@@ -22,7 +22,7 @@ class ControllerNotifier:
         self.__worker_thread.start()
         self.__worker_thread.run_coroutine(self.serial_client_loop())
 
-    def notify(self, data: bytearray) -> None:
+    def notify(self, data: str) -> None:
         self.__queue.put(data)
 
     async def serial_client_loop(self):
@@ -36,7 +36,7 @@ class ControllerNotifier:
                 while True:
                     try:
                         data = self.__queue.get_nowait()
-                        self.__logger.debug('Sending data to the robot...')
+                        self.__logger.debug(f'Sending data to the robot: {data}. ')
                         ser.write(data)
                         self.__logger.debug('Successfully sent data to the robot!')
                     except queue.Empty:
