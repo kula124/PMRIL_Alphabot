@@ -28,6 +28,7 @@ class VideoStream:
         self.stream.stop()
 
     def __enter__(self):
+        self.start()
         return self
 
     def __exit__(self):

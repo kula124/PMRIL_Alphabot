@@ -13,7 +13,7 @@ def main(config: configparser.ConfigParser):
     try:
         logger.info('Initializing image processor.')
         refresh_delay = config.getint('frame', 'refresh_delay')
-        with VideoStream(config).start() as video_stream:
+        with VideoStream(config) as video_stream:
             with AppStateManager(config) as app_state_manager:
                 logger.info('Successfully initialized image processor.')
                 while True:
