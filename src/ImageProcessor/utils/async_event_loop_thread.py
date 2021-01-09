@@ -18,6 +18,7 @@ class AsyncEventLoopThread(threading.Thread):
         return asyncio.run_coroutine_threadsafe(coroutine, loop=self.__loop)
 
     def stop(self) -> None:
-        self.__loop.call_soon_threadsafe(self.__loop.stop)
-        self.join()
-        self.__running = False
+        if self.__running:
+            self.__loop.call_soon_threadsafe(self.__loop.stop)
+            self.join()
+            self.__running = False
