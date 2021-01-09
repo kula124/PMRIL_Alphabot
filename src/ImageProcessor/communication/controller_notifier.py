@@ -11,9 +11,8 @@ from utils.async_event_loop_thread import AsyncEventLoopThread
 class ControllerNotifier:
     def __init__(self, config: configparser.ConfigParser):
         self.__logger = logger_factory.get_logger()
+        self.__config = config
 
-        self.__serial_port = f'/dev/{config.get("communication", "port")}'
-        self.__baudrate = config.getint('communication', 'baudrate')
         self.__poll_interval = config.getfloat('communication', 'poll_interval_in_ms') / 1000
 
         self.__queue = queue.Queue()
@@ -28,9 +27,12 @@ class ControllerNotifier:
 
     async def serial_client_loop(self):
         try:
+            port = f'/dev/{self.__config.get("communication", "port")}'
+            baudrate = self.__config.getint('communication', 'baudrate')
+
             # noinspection PyUnresolvedReferences
             # Serial is dynamically assigned depending on the current platform
-            with serial.Serial(self.__serial_port, baudrate=self.__baudrate) as ser:
+            with serial.Serial(port, baudrate=baudrate) as ser:
                 while True:
                     try:
                         data = self.__queue.get_nowait()
