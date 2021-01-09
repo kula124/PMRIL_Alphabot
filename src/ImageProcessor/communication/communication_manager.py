@@ -25,6 +25,9 @@ class CommunicationManager:
         self.__add_samples(filtered_objects)
         self.__target_coordinates = target
 
+        if self.__controller_notifier.exc_info:
+            raise self.__controller_notifier.exc_info[1].with_traceback(self.__controller_notifier.exc_info[2])
+
         if self.__should_send_data():
             sample_request_model = self.__build_sample_request_model()
 

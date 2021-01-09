@@ -2,7 +2,7 @@ import configparser
 
 from cv2.cv2 import waitKey
 
-from detector.video_provider import get_video_provider
+from detector.VideoStream import VideoStream
 from state.app_state_manager import AppStateManager
 from utils import logger_factory
 
@@ -10,22 +10,20 @@ from utils import logger_factory
 def main(config: configparser.ConfigParser):
     logger = logger_factory.get_logger()
 
-    logger.info('Initializing image processor.')
-    refresh_delay = config.getint('frame', 'refresh_delay')
-    video = get_video_provider(config)
+    try:
+        logger.info('Initializing image processor.')
+        refresh_delay = config.getint('frame', 'refresh_delay')
+        with VideoStream(config) as video_stream:
+            with AppStateManager(config) as app_state_manager:
+                logger.info('Successfully initialized image processor.')
+                while True:
+                    camera_feed_matrix = video_stream.read()
 
-    with AppStateManager(config) as app_state_manager:
-        logger.info('Successfully initialized image processor.')
-        while True:
-            has_data, camera_feed_matrix = video.read()
+                    app_state_manager.get_state_action(camera_feed_matrix)()
 
-            if not has_data:
-                logger.error('No data from the source')
-                return -1
-
-            app_state_manager.get_state_action(camera_feed_matrix)()
-
-            waitKey(refresh_delay)
+                    waitKey(refresh_delay)
+    except Exception as e:
+        logger.error(f'Unhandled exception occurred. Shutting down! Reason:{e}')
 
 
 if __name__ == '__main__':
