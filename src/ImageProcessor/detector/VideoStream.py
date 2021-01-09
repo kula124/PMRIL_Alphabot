@@ -1,13 +1,13 @@
 # import the necessary packages
 import configparser
 
-from WebcamVideoStream import WebcamVideoStream
+from detector.WebcamVideoStream import WebcamVideoStream
 
 
 class VideoStream:
     def __init__(self, config: configparser.ConfigParser):
         if config.getboolean('frame', 'use_pi_camera'):
-            from PiVideoStream import PiVideoStream
+            from detector.PiVideoStream import PiVideoStream
             # initialize the picamera stream and allow the camera
             # sensor to warmup
             self.stream = PiVideoStream(config)
