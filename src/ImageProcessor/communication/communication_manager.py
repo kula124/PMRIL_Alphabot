@@ -33,7 +33,7 @@ class CommunicationManager:
 
             self.__logger.debug(
                 f'Sampled data (Trunk:{self.__trunk_sample_count}, Hood:{self.__hood_sample_count}): {sample_request_model} ')
-            self.__controller_notifier.notify(sample_request_model.as_ascii_bytes())
+            self.__controller_notifier.notify(sample_request_model.as_big_endian_bytes())
             self.__reset_samples()
 
     def __add_samples(self, filtered_objects: List[Object]) -> None:

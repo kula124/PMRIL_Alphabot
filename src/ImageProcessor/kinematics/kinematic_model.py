@@ -19,7 +19,7 @@ class KinematicValues:
         First 4 bytes are v and last 4 are w
         :return: byte array representing speed and angular speed
         """
-        return bytearray(struct.pack('!f', self.v)) + bytearray(struct.pack('!f', self.w))
+        return bytearray(struct.pack('f', self.v)) + bytearray(struct.pack('f', self.w))
 
 
 class KinematicModel:
