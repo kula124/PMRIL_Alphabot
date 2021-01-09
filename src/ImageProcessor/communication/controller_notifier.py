@@ -22,7 +22,7 @@ class ControllerNotifier:
         self.__worker_thread.start()
         self.__worker_thread.run_coroutine(self.serial_client_loop())
 
-    def notify(self, data: str) -> None:
+    def notify(self, data: bytes) -> None:
         self.__queue.put(data)
 
     async def serial_client_loop(self):

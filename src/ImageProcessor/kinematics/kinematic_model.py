@@ -11,8 +11,8 @@ class KinematicValues:
         self.v = v
         self.w = w
 
-    def as_string(self)->str:
-        return STRING_FORMAT.format(self.v,self.w)
+    def as_ascii_bytes(self)->bytes:
+        return STRING_FORMAT.format(self.v,self.w).encode(encoding="ASCII")
 
     def as_big_endian_bytes(self) -> bytearray:
         """
