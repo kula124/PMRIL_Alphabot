@@ -14,16 +14,27 @@ class ControllerNotifier:
         self.__config = config
 
         self.__poll_interval = config.getfloat('communication', 'poll_interval_in_ms') / 1000
-
         self.__queue = queue.Queue()
         self.exc_info = None
 
         self.__worker_thread = AsyncEventLoopThread()
         self.__worker_thread.start()
-        self.__worker_thread.run_coroutine(self.serial_client_loop())
+
+        if config.getboolean('communication', 'enabled'):
+            self.__worker_thread.run_coroutine(self.serial_client_loop())
+        else:
+            self.__worker_thread.run_coroutine(self.dummy_loop())
 
     def notify(self, data: bytearray) -> None:
         self.__queue.put(data)
+
+    async def dummy_loop(self):
+        while True:
+            try:
+                data = self.__queue.get_nowait()
+                self.__logger.debug('Data sending is disabled.')
+            except queue.Empty:
+                await asyncio.sleep(self.__poll_interval)
 
     async def serial_client_loop(self):
         try:
