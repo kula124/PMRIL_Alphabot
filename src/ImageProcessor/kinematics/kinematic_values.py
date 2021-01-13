@@ -12,3 +12,6 @@ class KinematicValues:
         :return: byte array representing speed and angular speed
         """
         return bytearray(struct.pack('!f', self.v)) + bytearray(struct.pack('!f', self.w))
+
+    def __repr__(self):
+        return f'v:{self.v}, w:{self.w}'
