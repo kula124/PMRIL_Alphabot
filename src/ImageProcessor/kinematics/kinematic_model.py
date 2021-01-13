@@ -23,6 +23,7 @@ class KinematicModel:
         if goal != self.__current_goal:
             self.__v_pid.reset()
             self.__w_pid.reset()
+            self.__current_goal = goal
 
         robot = ((trunk[0] + hood[0]) / 2, (trunk[1] + hood[1]) / 2)
 
