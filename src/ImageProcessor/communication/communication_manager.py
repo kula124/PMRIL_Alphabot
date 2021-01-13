@@ -2,7 +2,8 @@ import configparser
 from typing import List, Tuple
 
 from communication.controller_notifier import ControllerNotifier
-from kinematics.kinematic_model import KinematicModel, KinematicValues
+from kinematics.kinematic_model import KinematicModel
+from kinematics.kinematic_values import KinematicValues
 from models.object import Object
 from models.sample import Sample
 from models.vehicle_enum import VehiclePart
