@@ -18,8 +18,8 @@ def main(config: configparser.ConfigParser):
                 logger.info('Successfully initialized image processor.')
                 while True:
                     camera_feed_matrix = video_stream.read()
-
-                    app_state_manager.get_state_action(camera_feed_matrix)()
+                    if camera_feed_matrix and len(camera_feed_matrix) > 0:
+                        app_state_manager.get_state_action(camera_feed_matrix)()
 
                     waitKey(refresh_delay)
     except Exception as e:
