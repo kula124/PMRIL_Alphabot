@@ -27,18 +27,59 @@ volatile int R_Current_rpm = 0;
 void l_interupt();
 void r_interupt();
 
-const int _target_rpm = 200;
+volatile double l_target_rpm = 0;
+volatile double r_target_rpm = 0;
 
-double lKp = 1.5, lKi = 2.5, lKd = 0, lSetpoint, lInput, lOutput;
-PID LmyPID(&lInput, &lOutput, &lSetpoint, lKp, lKi, lKd, DIRECT);
+double lKp = 1.5, lKi = 2.0, lKd = 0, lInput, lOutput;
+PID LmyPID(&lInput, &lOutput, &l_target_rpm, lKp, lKi, lKd, DIRECT);
 
-double rKp = 1.5, rKi = 2.5, rKd = 0, rSetpoint, rInput, rOutput;
-PID RmyPID(&rInput, &rOutput, &rSetpoint, rKp, rKi, rKd, DIRECT);
+double rKp = 1.5, rKi = 2.0, rKd = 0, rSetpoint, rInput, rOutput;
+PID RmyPID(&rInput, &rOutput, &r_target_rpm, rKp, rKi, rKd, DIRECT);
 
 double LGetRpm();
 double RGetRpm();
 bool LSetRpm(void *args);
 bool RsetRpm(void *args);
+bool LDIR, RDIR;
+
+const double _base_speed = 150;
+const double L = 0.15;
+
+double abs_v(float f);
+
+class Communicator
+{
+public:
+  int didReadData()
+  {
+    return Serial.available();
+  }
+  void updateRpms()
+  {
+    float v, w;
+    if (Serial.available() != 0 && Serial.available() % (2 * sizeof(float)) == 0)
+    {
+      Serial.readBytes((char *)&v, sizeof(float));
+      Serial.readBytes((char *)&w, sizeof(float));
+
+      double diff = w;
+      /*Serial.println(diff);
+      Serial.println(w);
+      Serial.println("---------");*/
+      // r_target_rpm = v;
+      if (v == 0)
+      {
+        r_target_rpm = 0;
+        l_target_rpm = 0;
+        return;
+      }
+      r_target_rpm = _base_speed + diff;
+      l_target_rpm = _base_speed - diff;
+    };
+  }
+};
+
+Communicator comms;
 
 void setup()
 {
@@ -47,6 +88,10 @@ void setup()
   pinMode(L_CD_PIN, OUTPUT);
   pinMode(L_PWM_PIN, OUTPUT);
 
+  pinMode(R_D_PIN, OUTPUT);
+  pinMode(R_CD_PIN, OUTPUT);
+  pinMode(R_PWM_PIN, OUTPUT);
+
   pinMode(L_ENC, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(L_ENC), l_interupt, FALLING);
   pinMode(L_ENC, INPUT_PULLUP);
@@ -54,12 +99,10 @@ void setup()
 
   LmyPID.SetMode(AUTOMATIC);
   lInput = 0;
-  lSetpoint = _target_rpm;
   timer.every(200, LSetRpm);
 
   RmyPID.SetMode(AUTOMATIC);
   rInput = 0;
-  rSetpoint = _target_rpm;
   timer.every(200, RsetRpm);
 
   digitalWrite(L_D_PIN, LOW);
@@ -68,23 +111,29 @@ void setup()
   digitalWrite(R_D_PIN, HIGH);
   digitalWrite(R_CD_PIN, LOW);
 
-  Serial.begin(9600);
+  Serial.begin(57600);
+  // Serial.begin(9600);
+  Serial.setTimeout(100);
 }
 
 void loop()
 {
   // Input = getRpm();
   timer.tick();
+  // Serial.println(LGetRpm()); // Serial.print(',');
+  comms.updateRpms();
   lInput = LGetRpm();
-  Serial.println(LGetRpm()); // Serial.print(',');
+  rInput = RGetRpm();
+
   LmyPID.Compute();
   analogWrite(L_PWM_PIN, lOutput);
-  // Serial.println(Output);
 
-  rInput = RGetRpm();
   // Serial.print(',');
   RmyPID.Compute();
   analogWrite(R_PWM_PIN, rOutput);
+  /*Serial.println(lOutput);
+  Serial.println(rOutput);
+  Serial.println("-----");*/
 }
 
 void l_interupt()
@@ -122,3 +171,8 @@ bool RsetRpm(void *args)
   R_Current_rpm = (diff / 20) * 5 * 60;
   return true;
 }
+
+double abs_v(float f)
+{
+  return f > 0 ? (double)f : (double)-f;
+};
