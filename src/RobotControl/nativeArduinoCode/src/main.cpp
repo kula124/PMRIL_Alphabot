@@ -13,6 +13,7 @@
 #define R_D_PIN A2
 #define R_CD_PIN A3
 #define R_PWM_PIN 6
+#define TIMER_INTERVAL_MS 200
 
 auto timer = timer_create_default();
 volatile int L_Counter = 0;
@@ -24,20 +25,18 @@ volatile int L_Current_rpm = 0;
 volatile int R_Counter_prev = 0;
 volatile int R_Current_rpm = 0;
 
-void l_interupt();
-void r_interupt();
+void l_interrupt();
+void r_interrupt();
 
 volatile double l_target_rpm = 0;
 volatile double r_target_rpm = 0;
 
-double lKp = 1.5, lKi = 2.0, lKd = 0, lInput, lOutput;
+double lKp = 1.2, lKi = 2.0, lKd = 0, lInput, lOutput;
 PID LmyPID(&lInput, &lOutput, &l_target_rpm, lKp, lKi, lKd, DIRECT);
 
-double rKp = 1.5, rKi = 2.0, rKd = 0, rSetpoint, rInput, rOutput;
+double rKp = 1.2, rKi = 2.0, rKd = 0, rSetpoint, rInput, rOutput;
 PID RmyPID(&rInput, &rOutput, &r_target_rpm, rKp, rKi, rKd, DIRECT);
 
-double LGetRpm();
-double RGetRpm();
 bool LSetRpm(void *args);
 bool RsetRpm(void *args);
 bool LDIR, RDIR;
@@ -93,17 +92,17 @@ void setup()
   pinMode(R_PWM_PIN, OUTPUT);
 
   pinMode(L_ENC, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(L_ENC), l_interupt, FALLING);
-  pinMode(L_ENC, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(R_ENC), r_interupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(L_ENC), l_interrupt, FALLING);
+  pinMode(R_ENC, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(R_ENC), r_interrupt, FALLING);
 
   LmyPID.SetMode(AUTOMATIC);
   lInput = 0;
-  timer.every(200, LSetRpm);
+  timer.every(TIMER_INTERVAL_MS, LSetRpm);
 
   RmyPID.SetMode(AUTOMATIC);
   rInput = 0;
-  timer.every(200, RsetRpm);
+  timer.every(TIMER_INTERVAL_MS, RsetRpm);
 
   digitalWrite(L_D_PIN, LOW);
   digitalWrite(L_CD_PIN, HIGH);
@@ -122,8 +121,8 @@ void loop()
   timer.tick();
   // Serial.println(LGetRpm()); // Serial.print(',');
   comms.updateRpms();
-  lInput = LGetRpm();
-  rInput = RGetRpm();
+  lInput = L_Current_rpm;
+  rInput = R_Current_rpm;
 
   LmyPID.Compute();
   analogWrite(L_PWM_PIN, lOutput);
@@ -136,31 +135,21 @@ void loop()
   Serial.println("-----");*/
 }
 
-void l_interupt()
+void l_interrupt()
 {
   L_Counter++;
 }
 
-void r_interupt()
+void r_interrupt()
 {
   R_Counter++;
-}
-
-double LGetRpm()
-{
-  return L_Current_rpm;
-}
-
-double RGetRpm()
-{
-  return R_Current_rpm;
 }
 
 bool LSetRpm(void *args)
 {
   float diff = L_Counter - L_Counter_prev;
   L_Counter_prev = L_Counter;
-  L_Current_rpm = (diff / 20) * 5 * 60;
+  L_Current_rpm = (diff / 20) * 1000 / TIMER_INTERVAL_MS * 60;
   return true;
 }
 
@@ -168,7 +157,7 @@ bool RsetRpm(void *args)
 {
   float diff = R_Counter - R_Counter_prev;
   R_Counter_prev = R_Counter;
-  R_Current_rpm = (diff / 20) * 5 * 60;
+  R_Current_rpm = (diff / 20) * 1000 / TIMER_INTERVAL_MS * 60;
   return true;
 }
 
